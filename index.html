@@ -20,11 +20,19 @@
             text-align: center;
             height: 100vh;
         }
+        #aviso{
+            margin-top:55px;
+            color: green;
+            text-align: center;
+            font-size:22px;
+        }
     </style>
 </head>
 
 <body>
-    <header></header>
+    <header>
+        <p id="aviso"></p>
+    </header>
     <main>
         <!-- el atributo multiple permite subir multiples archivos -->
         <input type="file" id="files" name="files" multiple>
@@ -32,9 +40,9 @@
     <footer></footer>
     <script>
         const d = document;
+        const aviso = d.getElementById('aviso');
         const main = d.querySelector('main')
         const inputFile = d.getElementById('files')
-
 
         /*
         tipo de objeto: new FormData()
@@ -45,22 +53,29 @@
         */
         // funcion uploader con el objeto XMLHttpRequest()
         const uploader = file => {
-            /* console.log(file) */
+            if(file){
+                console.log(file)
+                aviso.textContent = "archivo subido"
+            }
+            
             const xhr = new XMLHttpRequest();
             let formData = new FormData();
             formData.append("file", file)
-            console.log(formData)
+            
             // el primer atributo es como el name de cada input, se crea dinamicamente y lo creo del archivo que recibe la funcion
             xhr.addEventListener('readystatechange', () => {
                 if(xhr.readystatechange !== 4) return;
                 if(xhr.status >= 200 && xhr.status < 300){
-                    console.log(xhr.responseText);
+                
+                    let json = JSON.parse(xhr.responseText);
+                    console.log(json)
+                    console.log(xhr.responseText)
                 }else{
                     console.log(`errorrrrrrrrrrrrrr`);
                 }
             })
 
-            xhr.open('POST', './uploader.php')
+            xhr.open('POST', './uploader.php');
             // la url que recibe realizo la programacion del lado del servidor con php, archivo uploader.php
 
             ////////////////////////////////
@@ -85,8 +100,7 @@
                 // el metodo Array.from - me permite volver 'iterable' ciertos objetos que no lo eran
             }
         })
-    </script>
-    <script src = "./js/index.js"></script>
+    </script> 
     <!-- archivo que corre con nodejs -->
     
 </body>
