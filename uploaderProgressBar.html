@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uploader ajax</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+        }
+
+        #aviso {
+            margin-top: 55px;
+            color: green;
+            text-align: center;
+            font-size: 22px;
+        }
+
+        progress {
+            margin-top: 20px;
+            display: inline-flex;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <p id="aviso"></p>
+    </header>
+    <main>
+        <!-- el atributo multiple permite subir multiples archivos -->
+        <input type="file" id="files" name="files" multiple>
+    </main>
+    <footer></footer>
+    <script>
+        const d = document;
+        const aviso = d.getElementById('aviso');
+        const main = d.querySelector('main')
+        const inputFile = d.getElementById('files')
+
+
+        /*
+        tipo de objeto: new FormData()
+
+        cuando no tengo un formulario como tal que enviar, se realiza una simulacion a través de este objeto
+
+        este FormData recibe como parametro el formulario, pero como en este caso no estamos usando un formulario, se hace uso del método append(), como para agregarle un elemento a ese objeto
+        */
+        // funcion uploader con el objeto XMLHttpRequest()
+        const uploader = file => {
+
+            const xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append("file", file)
+
+            // el primer atributo es como el name de cada input, se crea dinamicamente y lo creo del archivo que recibe la funcion
+            xhr.addEventListener('readystatechange', () => {
+                if (xhr.readystatechange !== 4) return;
+                if (xhr.status >= 200 && xhr.status < 300) {
+
+                    let json = JSON.parse(xhr.responseText);
+                    console.log(json)
+                } else {
+                    console.log(`errorrrrrrrrrrrrrr`);
+                }
+            })
+
+            xhr.open('POST', './uploader.php');
+            // la url que recibe realizo la programacion del lado del servidor con php, archivo uploader.php
+
+            ////////////////////////////////
+            // como estamos subiendo archivos binarios,(contiene una informacion codficada en lenguaje binario), por ende necesitamos una cabecera diferente
+            xhr.setRequestHeader('enc-type', 'multipart/form-data')
+            // envio lo que viene en la variable de formulario, osea cada archivo
+            xhr.send(formData)
+        }
+
+        // funcion que trabaja el progress bar
+        const progressBar = file => {
+            const $progress = d.createElement('progress');
+            const $span = d.createElement('span');
+
+            $progress.max = 100;
+            $progress.value = 0;
+
+            main.insertAdjacentElement('beforeend', $progress);
+            main.insertAdjacentElement('beforeend', $span);
+
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+
+            fileReader.addEventListener('progress', e => {
+                if (file.size >= 10000000) {
+                    $progress.remove();
+                    $span.style.color = "red";
+                    $span.textContent = "archivo demasiado grande, máximo 10mb";
+                } else {
+                    $span.textContent = `${Math.round($progress.value)}%`;
+                    setTimeout(() => {
+                        $progress.value = (e.loaded * 100) / e.total;
+                        $span.textContent = `${Math.round($progress.value)}% - archivo: enviado`;
+
+                    }, 1500)
+                }
+            })
+            fileReader.addEventListener('loadend', e => {
+                uploader(file)
+                if (e.loaded !== undefined) {
+                    setTimeout(() => {
+                        inputFile.value = '';
+                        $progress.remove();
+                        $span.remove();
+                    }, 2700)
+                }
+            })
+
+        }
+
+        d.addEventListener('change', e => {
+            if (e.target === inputFile) {
+                // el .files me permite ver los archivos que se estan subiendo
+                // e.target.files
+
+
+                // guardo los archivos a subir en la constante files
+                const files = e.target.files
+                for (file of files) {
+                    progressBar(file)
+                    // por cada file - archivo que venga dentro de la constante files me ejecuta uploader(), linea 38
+                }
+                // el metodo Array.from - me permite volver 'iterable' ciertos objetos que no lo eran
+            }
+        })
+    </script>
+    <!-- archivo que corre con nodejs -->
+
+</body>
+
+</html>

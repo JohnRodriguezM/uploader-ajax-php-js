@@ -16,6 +16,7 @@
         main {
             display: flex;
             justify-content: center;
+            flex-direction: column;
             align-items: center;
             text-align: center;
             height: 100vh;
@@ -25,6 +26,9 @@
             color: green;
             text-align: center;
             font-size:22px;
+        }
+        progress{
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -36,6 +40,7 @@
     <main>
         <!-- el atributo multiple permite subir multiples archivos -->
         <input type="file" id="files" name="files" multiple>
+        <progress value = "70" max = "100"></progress>
     </main>
     <footer></footer>
     <script>
