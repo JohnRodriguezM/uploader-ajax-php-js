@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>uploader ajax</title>
+    <title>uploader drag && drop ajax</title>
     <style>
         * {
             padding: 0;
@@ -23,7 +23,7 @@
         }
 
         #aviso {
-            margin-top: 55px;
+            margin-top: 15px;
             color: green;
             text-align: center;
             font-size: 22px;
@@ -33,23 +33,84 @@
             margin-top: 20px;
             display: inline-flex;
         }
+        .dropZone{
+            width: 50%;
+            max-width: 500px;
+            border: 1px solid black;
+            margin: auto;
+            height:180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dropZoneActive{
+            border: thick dashed blue;
+            background-color: blue;
+            animation: pulse 1.5s infinite;
+            animation-timing-function: linear;
+            cursor:move;
+        }
+
+        @keyframes pulse {
+            0%,
+            100%{
+                transform: scale(1);
+            }
+            50%{
+                transform: scale(1.1);
+            }
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <p id="aviso"></p>
+        <article id="aviso"></article>
     </header>
     <main>
-        <!-- el atributo multiple permite subir multiples archivos -->
-        <input type="file" id="files" name="files" multiple>
+        <div class="dropZone" draggable="true">
+            arrastra y suelta tus archivos...
+        </div>
     </main>
     <footer></footer>
     <script>
+
         const d = document;
         const aviso = d.getElementById('aviso');
         const main = d.querySelector('main')
-        const inputFile = d.getElementById('files')
+        const $dropZone = d.querySelector('.dropZone');
+        // animacion hover con drag
+        
+        // el evento drag me permite manejar todo ese tema, es similar al mouseout or mouseover
+        document.querySelector('body').addEventListener('mouseover', e =>{
+            if(e.target.classList.contains('dropZone')){
+                e.target.classList.remove('dropZoneActive');
+            }
+        });
+        document.querySelector('.dropZone').addEventListener('dragover', e => {
+            /* console.log(e); */
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.add('dropZoneActive');
+        });
+
+        document.querySelector('.dropZone').addEventListener('dragleave', e => {
+            /* console.log(e); */
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.remove('dropZoneActive');
+        })
+
+        document.querySelector('.dropZone').addEventListener('drop',e => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log(e);
+            const files = e.dataTransfer.files;
+            for(file of files) {
+                progressBar(file)
+            }
+        })
+
 
 
         /*
@@ -120,7 +181,7 @@
                 uploader(file)
                 if (e.loaded !== undefined) {
                     setTimeout(() => {
-                        inputFile.value = '';
+                        inputFile.value = ''; 
                         $progress.remove();
                         $span.remove();
                     }, 2700)
@@ -129,6 +190,10 @@
 
         }
 
+        /* 
+        se reemplaza por ejecutarse dentro de la funcion con el evento drop
+         
+        
         d.addEventListener('change', e => {
             if (e.target === inputFile) {
                 // el .files me permite ver los archivos que se estan subiendo
@@ -143,7 +208,7 @@
                 }
                 // el metodo Array.from - me permite volver 'iterable' ciertos objetos que no lo eran
             }
-        })
+        }) */
     </script>
     <!-- archivo que corre con nodejs -->
 
