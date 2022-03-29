@@ -22,41 +22,40 @@
             height: 100vh;
         }
 
-        #aviso {
-            margin-top: 15px;
-            color: green;
-            text-align: center;
-            font-size: 22px;
-        }
-
         progress {
             margin-top: 20px;
             display: inline-flex;
         }
-        .dropZone{
+
+        .dropZone {
             width: 50%;
             max-width: 500px;
             border: 1px solid black;
-            margin: auto;
-            height:180px;
+            background-color: rgb(213, 206, 223);
+            margin: 10px auto;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        .dropZoneActive{
+
+        .dropZoneActive {
             border: thick dashed blue;
+            border-radius: 45px;
             background-color: blue;
             animation: pulse 1.5s infinite;
             animation-timing-function: linear;
-            cursor:move;
+            cursor: move;
         }
 
         @keyframes pulse {
+
             0%,
-            100%{
+            100% {
                 transform: scale(1);
             }
-            50%{
+
+            50% {
                 transform: scale(1.1);
             }
         }
@@ -65,25 +64,23 @@
 
 <body>
     <header>
-        <article id="aviso"></article>
     </header>
     <main>
         <div class="dropZone" draggable="true">
-            arrastra y suelta tus archivos...
+            Arrastra y suelta tus archivos...
         </div>
     </main>
     <footer></footer>
     <script>
-
         const d = document;
         const aviso = d.getElementById('aviso');
         const main = d.querySelector('main')
         const $dropZone = d.querySelector('.dropZone');
         // animacion hover con drag
-        
+
         // el evento drag me permite manejar todo ese tema, es similar al mouseout or mouseover
-        document.querySelector('body').addEventListener('mouseover', e =>{
-            if(e.target.classList.contains('dropZone')){
+        document.querySelector('body').addEventListener('mouseover', e => {
+            if (e.target.classList.contains('dropZone')) {
                 e.target.classList.remove('dropZoneActive');
             }
         });
@@ -101,12 +98,12 @@
             e.target.classList.remove('dropZoneActive');
         })
 
-        document.querySelector('.dropZone').addEventListener('drop',e => {
+        document.querySelector('.dropZone').addEventListener('drop', e => {
             e.preventDefault();
             e.stopPropagation();
             console.log(e);
             const files = e.dataTransfer.files;
-            for(file of files) {
+            for (file of files) {
                 progressBar(file)
             }
         })
@@ -179,12 +176,11 @@
             })
             fileReader.addEventListener('loadend', e => {
                 uploader(file)
-                if (e.loaded !== undefined) {
+                if (e.isTrusted !== undefined) {
                     setTimeout(() => {
-                        inputFile.value = ''; 
                         $progress.remove();
                         $span.remove();
-                    }, 2700)
+                    }, 3000)
                 }
             })
 
